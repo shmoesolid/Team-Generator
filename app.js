@@ -1,3 +1,7 @@
+
+/////////////////////////////////////////////////////////////////
+// REQUIRE CONSTANTS
+//
 const Manager = require("./lib/Manager");
 const Intern = require("./lib/Intern");
 const Engineer = require("./lib/Engineer");
@@ -6,50 +10,72 @@ const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
 
+const render = require("./lib/htmlRenderer");
+const Employee = require("./lib/Employee");
+
+
+/////////////////////////////////////////////////////////////////
+// OTHER CONSTANTS
+//
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
-const render = require("./lib/htmlRenderer");
-
 const EMP_TYPE = Object.freeze({ Engineer:0, Intern:1, Manager:2 });
-const EMP_CONV = ["Engineer","Intern","Manager"];
+const EMP_CONVERT = ["Engineer","Intern","Manager"];
 
+
+/////////////////////////////////////////////////////////////////
+// EMPLOYEES VARIABLE (oh so looonnnlleeeey)
+//
+var employees = [];
+
+
+/////////////////////////////////////////////////////////////////
+// QUESTIONS STANDARD 
+//
 const standardQues = (type) =>
 [
     {
         name: 'name',
-        message: `What is the ${EMP_CONV[type]}\'s name?`,
         type: 'input',
+        message: `What is the ${EMP_CONVERT[type]}\'s name?`,
         // TODO: add filter, must not be blank
     },
     {
         name: 'id',
-        message: `What is the ${EMP_CONV[type]}\'s ID?`,
         type: 'input',
+        message: `What is the ${EMP_CONVERT[type]}\'s ID?`,
         // TODO: add filter, must be number
     },
     {
         name: 'email',
-        message: `What is the ${EMP_CONV[type]}\'s email?`,
         type: 'input',
+        message: `What is the ${EMP_CONVERT[type]}\'s email?`,
         // TODO: add filter, must be email
     },
 ];
 
+
+/////////////////////////////////////////////////////////////////
+// QUESTIONS LOOPBACK/TYPE
+//
 const loopQues = 
 [
     {
         name: 'add',
         type: 'confirm',
         message: 'Would you like to add an employee?',
-    },
+    }
+];
+const typeQues = 
+[
     {
         name: 'type',
         type: 'list',
         message: 'What type of employee would you like to add?',
         choices: 
         [   
-            //Array.from(EMP_CONV) // naaahhh
+            //Array.from(EMP_CONVERT) // naaahhh
             "Engineer",
             "Intern",
             // manager is already taken care of
@@ -57,64 +83,62 @@ const loopQues =
     }
 ];
 
+
+/////////////////////////////////////////////////////////////////
+// QUESTIONS BY SPECIFIC TYPE
+//
 const managerQues =
 [
     {
-        name: 'number',
+        name: 'office',
         type: 'input',
-        message: 'What is your manager\'s office number?'
+        message: 'What is your manager\'s office number?',
         // TODO: add filter, must be number
     }
 ];
-
 const engineerQues = 
 [
     {
         name: 'github',
         type: 'input',
-        message: 'What is your engineer\'s Github username?'
+        message: 'What is your engineer\'s Github username?',
+        // TODO: add filter, must NOT be blank
     }
 ];
-
 const internQues =
 [
     {
         name: 'school',
         type: 'input',
-        message: 'What is your intern\'s school name?'
+        message: 'What is your intern\'s school name?',
+        // TODO: add filter, must NOT be blank
     }
 ];
 
 
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
-var employees = [];
-
-// DEBUG
-//employees.push( new Manager("fooman", 1, "test@test.com", "github") );
-//employees.push( new Intern("foo", 2, "test@test.com", "UTSA") );
-// DEBUG
-
+/////////////////////////////////////////////////////////////////
+// VARIOUS MENUS
+//
 const loopMenu = () =>
 {
     // run inquirer
     inquirer
-        .prompt([
-            loopQues
-        ])
+        .prompt( loopQues )
         .then(answer => {
 
-            // run submenu based off employee_type
-            if (answer.menu === true && answer.employee_type) 
-                subMenu(answer.employee_type); 
-
-            // go back to main
-            else if (answer.menu === true)
-                loopMenu();
-
+            // run type menu or end it all
+            answer.add === true 
+                ? typeMenu() 
+                : endMenu();
         });
 };
-
+const typeMenu = () =>
+{
+    // run inquirer
+    inquirer
+        .prompt( typeQues )
+        .then(answer => { subMenu(EMP_TYPE[answer.type]) });
+};
 const subMenu = (employeeType) =>
 {
     // define standard and empty extra
@@ -124,47 +148,80 @@ const subMenu = (employeeType) =>
     // deal with extra
     switch(employeeType)
     {
-        case EMP_TYPE.Manager: extraQues = managerQues; break;
-        case EMP_TYPE.Engineer: extraQues = engineerQues; break;
-        case EMP_TYPE.Intern: extraQues = internQues; break;
+        case EMP_TYPE.Manager: extraQues = managerQues; console.log(extraQues); break;
+        case EMP_TYPE.Engineer: extraQues = engineerQues; console.log(extraQues);break;
+        case EMP_TYPE.Intern: extraQues = internQues; console.log(extraQues);break;
     }
 
-    // add on extra questions specific to type
-    allQues.concat(extraQues);
+    // add on extra questions specific to type if exists
+    Array.prototype.push.apply(allQues, extraQues);
 
     // run inquirer
     inquirer
         .prompt( allQues )
         .then(answer => 
         {
-            // ..
+            // establish new type
+            var newType = {};
+
+            // deal with specific answers
+            switch(employeeType)
+            {
+                case EMP_TYPE.Manager: 
+                    newType = new Manager(answer.name, answer.id, answer.email, answer.office); 
+                    break;
+                case EMP_TYPE.Engineer: 
+                    newType = new Engineer(answer.name, answer.id, answer.email, answer.github); 
+                    break;
+                case EMP_TYPE.Intern: 
+                    newType = new Intern(answer.name, answer.id, answer.email, answer.school); 
+                    break;
+                default:
+                    newType = new Employee(answer.name, answer.id, answer.email);
+            }
+
+            // push to employees array
+            employees.push( newType );
+
+            // back to loop menu
+            loopMenu();
         });
 };
+const endMenu = () => // jk no menu actually
+{
+    // render the employees data
+    var data = render(employees);
 
+    // make directory if doesn't exist
+    fs.mkdir(OUTPUT_DIR, {recursive: true}, (err) => { if (err) throw err; });
+
+    // write our data
+    fs.writeFile(outputPath, data, 'utf-8', (err) => { if (err) throw err; });
+};
+
+
+/////////////////////////////////////////////////////////////////
 // start the inquirer prompts with submenu first forcing manager
+//
 subMenu(EMP_TYPE.Manager);
 
+
+/////////////////////////////////////////////////////////////////
+// comments added by the powers that be
+//
+// Write code to use inquirer to gather information about the development team members,
+// and to create objects for each team member (using the correct classes as blueprints!)
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
-//var data = render(employees);
-
 // After you have your html, you're now ready to create an HTML file using the HTML
 // returned from the `render` function. Now write it to a file named `team.html` in the
 // `output` folder. You can use the variable `outputPath` above target this location.
 // Hint: you may need to check if the `output` folder exists and create it if it
 // does not.
-
-// make directory if doesn't exist
-//fs.mkdir(OUTPUT_DIR, {recursive: true}, (err) => { if (err) throw err; });
-
-// write our data
-//fs.writeFile(outputPath, data, 'utf-8', (err) => { if (err) throw err; });
-
 // HINT: each employee type (manager, engineer, or intern) has slightly different
 // information; write your code to ask different questions via inquirer depending on
 // employee type.
-
 // HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
 // and Intern classes should all extend from a class named Employee; see the directions
 // for further information. Be sure to test out each class and verify it generates an
