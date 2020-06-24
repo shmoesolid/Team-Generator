@@ -20,8 +20,8 @@ const Employee = require("./lib/Employee");
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
-const EMP_TYPE = Object.freeze({ Engineer:0, Intern:1, Manager:2 });
-const EMP_CONVERT = ["engineer","intern","manager"];
+const EMP_TYPE = Object.freeze({ Engineer:0, Intern:1, Other:2, Manager:3 });
+const EMP_CONVERT = ["engineer","intern","employee","manager"];
 
 
 /////////////////////////////////////////////////////////////////
@@ -77,13 +77,14 @@ const typeQues =
 [
     {
         name: 'type',
-        type: 'list',
+        type: 'rawlist',
         message: 'What type of employee would you like to add?',
         choices: 
         [   
             //Array.from(EMP_CONVERT) // naaahhh
             "Engineer",
             "Intern",
+            "Other"
             // manager is already taken care of
         ]
     }
@@ -162,7 +163,7 @@ const typeMenu = () =>
 const subMenu = (employeeType) =>
 {
     // define standard and empty extra
-    var allQues = standardQues(employeeType);
+    var allQues = standardQues( employeeType );
     var extraQues = [];
 
     // deal with extra types
