@@ -168,9 +168,9 @@ const subMenu = (employeeType) =>
     // deal with extra types
     switch(employeeType)
     {
-        case EMP_TYPE.Engineer: extraQues = engineerQues; console.log(extraQues); break;
-        case EMP_TYPE.Intern: extraQues = internQues; console.log(extraQues); break;
-        case EMP_TYPE.Manager: extraQues = managerQues; console.log(extraQues); break;
+        case EMP_TYPE.Engineer: extraQues = engineerQues; break;
+        case EMP_TYPE.Intern: extraQues = internQues; break;
+        case EMP_TYPE.Manager: extraQues = managerQues; break;
     }
 
     // add on extra questions specific to type if exists
