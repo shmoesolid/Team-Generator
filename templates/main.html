@@ -20,13 +20,27 @@
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="row">
-            <div class="team-area col-12 d-flex justify-content-center">
-                {{ team }}
-            </div>
-        </div>
+    <div class="container-centered">
+
+<!-- TEAM START -->
+{{ team }}
+<!-- TEAM END -->
+
     </div>
+
+    <style>
+        .container-centered
+        {
+            display: table;
+            margin: 0 auto;
+        }
+        .employee-card
+        {
+            margin: 5px;
+            min-width: 250px;
+            float: left;
+        }
+    </style>
 </body>
 
 </html>

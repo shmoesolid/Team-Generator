@@ -77,16 +77,20 @@ const typeQues =
 [
     {
         name: 'type',
-        type: 'rawlist',
+        type: 'list',
         message: 'What type of employee would you like to add?',
         choices: 
-        [   
-            //Array.from(EMP_CONVERT) // naaahhh
-            "Engineer",
-            "Intern",
-            "Other"
-            // manager is already taken care of
-        ]
+            // just because
+            Object
+                .keys(EMP_TYPE)
+                .slice(0, -1)
+                .map( x => x[0].toUpperCase() + x.slice(1) )
+        // [   
+        //     "Engineer",
+        //     "Intern",
+        //     "Other"
+        //      // manager is already taken care of
+        // ]
     }
 ];
 
