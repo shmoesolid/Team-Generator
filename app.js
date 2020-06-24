@@ -18,7 +18,7 @@ const Employee = require("./lib/Employee");
 // OTHER CONSTANTS
 //
 const OUTPUT_DIR = path.resolve(__dirname, "output");
-const outputPath = path.join(OUTPUT_DIR, "team.html");
+const outputPath = path.join(OUTPUT_DIR, "team_"+ Math.floor(new Date() / 1000) +".html");
 
 const EMP_TYPE = Object.freeze({ Engineer:0, Intern:1, Other:2, Manager:3 });
 const EMP_CONVERT = ["engineer","intern","employee","manager"];
@@ -214,6 +214,26 @@ const subMenu = (employeeType) =>
 };
 
 /**
+ * starts it all
+ * 
+ */
+const init = () =>
+{
+    // header
+    console.log(
+		"\n" +
+		"*****************************\n" +
+		"Welcome to the amazing Team Generator!\n\n" +
+		"Your generated html will be located:\n" +
+        outputPath +"\n\n" +
+		"*****************************\n"
+	);
+
+    // start the inquirer prompts with submenu first forcing manager
+    subMenu(EMP_TYPE.Manager);
+}
+
+/**
  * ends it all
  * 
  */
@@ -231,13 +251,13 @@ const endMenu = () => // jk no menu actually, wrap it up
 
 
 /////////////////////////////////////////////////////////////////
-// start the inquirer prompts with submenu first forcing manager
+// initialize the app
 //
-subMenu(EMP_TYPE.Manager);
+init();
 
 
 /////////////////////////////////////////////////////////////////
-// comments added by the powers that be
+// original comments from the powers that be
 //
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
