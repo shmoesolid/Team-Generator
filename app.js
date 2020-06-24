@@ -25,6 +25,50 @@ const EMP_CONVERT = ["engineer","intern","employee","manager"];
 
 
 /////////////////////////////////////////////////////////////////
+// VALIDATES
+
+/**
+ * confirms valid email string
+ * @param {string} string 
+ */
+const isEmail = (string) =>
+{
+    var valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(string);
+    if (!valid) console.log(" ...Value must be a valid email");
+    return valid;
+};
+
+/**
+ * confirms value is not blank
+ * @param {string} string 
+ */
+const isNotBlank = (string) =>
+{
+    if (!string) 
+    {
+        console.log(" ...Value must not be blank");
+        return false;
+    }
+    return true;
+};
+
+/**
+ * confirms valud is a number
+ * @param {string} string 
+ */
+const isNumber = (string) =>
+{
+    var res = parseInt(string);
+    if (!string || isNaN(res))
+    {
+        console.log(" ...Value must be a valid number");
+        return false;
+    }
+    return true;
+};
+
+
+/////////////////////////////////////////////////////////////////
 // EMPLOYEES VARIABLE (oh so looonnnlleeeey)
 //
 var employees = [];
@@ -45,19 +89,19 @@ const standardQues = (type) =>
         name: 'name',
         type: 'input',
         message: `What is the ${EMP_CONVERT[type]}\'s name?`,
-        // TODO: add filter, must not be blank
+        validate: name => isNotBlank(name) // must not be blank
     },
     {
         name: 'id',
         type: 'input',
         message: `What is the ${EMP_CONVERT[type]}\'s ID?`,
-        // TODO: add filter, must be number
+        validate: id => isNumber(id) // must be a number
     },
     {
         name: 'email',
         type: 'input',
         message: `What is the ${EMP_CONVERT[type]}\'s email?`,
-        // TODO: add filter, must be email
+        validate: email => isEmail(email) // must be an email format
     },
 ];
 
@@ -104,7 +148,7 @@ const managerQues =
         name: 'office',
         type: 'input',
         message: 'What is your manager\'s office number?',
-        // TODO: add filter, must be number
+        validate: id => isNumber(id) // must be a number
     }
 ];
 const engineerQues = 
@@ -113,7 +157,7 @@ const engineerQues =
         name: 'github',
         type: 'input',
         message: 'What is your engineer\'s Github username?',
-        // TODO: add filter, must NOT be blank
+        validate: username => isNotBlank(username) // must not be blank
     }
 ];
 const internQues =
@@ -122,7 +166,7 @@ const internQues =
         name: 'school',
         type: 'input',
         message: 'What is your intern\'s school name?',
-        // TODO: add filter, must NOT be blank
+        validate: schoolName => isNotBlank(schoolName) // must not be blank
     }
 ];
 
