@@ -21,7 +21,7 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const EMP_TYPE = Object.freeze({ Engineer:0, Intern:1, Manager:2 });
-const EMP_CONVERT = ["Engineer","Intern","Manager"];
+const EMP_CONVERT = ["engineer","intern","manager"];
 
 
 /////////////////////////////////////////////////////////////////
@@ -33,6 +33,12 @@ var employees = [];
 /////////////////////////////////////////////////////////////////
 // QUESTIONS STANDARD 
 //
+
+/**
+ * handles standard common questions amongst the masses
+ * 
+ * @param {EMP_TYPE} type 
+ */
 const standardQues = (type) =>
 [
     {
@@ -119,6 +125,10 @@ const internQues =
 /////////////////////////////////////////////////////////////////
 // VARIOUS MENUS
 //
+
+/**
+ * basically main loopback to confirm if continuing or ending
+ */
 const loopMenu = () =>
 {
     // run inquirer
@@ -132,6 +142,10 @@ const loopMenu = () =>
                 : endMenu();
         });
 };
+
+/**
+ * handles sub menus based on type selected
+ */
 const typeMenu = () =>
 {
     // run inquirer
@@ -139,18 +153,24 @@ const typeMenu = () =>
         .prompt( typeQues )
         .then(answer => { subMenu(EMP_TYPE[answer.type]) });
 };
+
+/**
+ * handles actual employee questions with some extra functionality
+ * 
+ * @param {EMP_TYPE} employeeType 
+ */
 const subMenu = (employeeType) =>
 {
     // define standard and empty extra
     var allQues = standardQues(employeeType);
     var extraQues = [];
 
-    // deal with extra
+    // deal with extra types
     switch(employeeType)
     {
+        case EMP_TYPE.Engineer: extraQues = engineerQues; console.log(extraQues); break;
+        case EMP_TYPE.Intern: extraQues = internQues; console.log(extraQues); break;
         case EMP_TYPE.Manager: extraQues = managerQues; console.log(extraQues); break;
-        case EMP_TYPE.Engineer: extraQues = engineerQues; console.log(extraQues);break;
-        case EMP_TYPE.Intern: extraQues = internQues; console.log(extraQues);break;
     }
 
     // add on extra questions specific to type if exists
@@ -161,41 +181,46 @@ const subMenu = (employeeType) =>
         .prompt( allQues )
         .then(answer => 
         {
-            // establish new type
-            var newType = {};
+            // establish empty new object type
+            var newObj = {};
 
             // deal with specific answers
             switch(employeeType)
             {
                 case EMP_TYPE.Manager: 
-                    newType = new Manager(answer.name, answer.id, answer.email, answer.office); 
+                    newObj = new Manager(answer.name, answer.id, answer.email, answer.office); 
                     break;
                 case EMP_TYPE.Engineer: 
-                    newType = new Engineer(answer.name, answer.id, answer.email, answer.github); 
+                    newObj = new Engineer(answer.name, answer.id, answer.email, answer.github); 
                     break;
                 case EMP_TYPE.Intern: 
-                    newType = new Intern(answer.name, answer.id, answer.email, answer.school); 
+                    newObj = new Intern(answer.name, answer.id, answer.email, answer.school); 
                     break;
                 default:
-                    newType = new Employee(answer.name, answer.id, answer.email);
+                    newObj = new Employee(answer.name, answer.id, answer.email);
             }
 
             // push to employees array
-            employees.push( newType );
+            employees.push( newObj );
 
             // back to loop menu
             loopMenu();
         });
 };
-const endMenu = () => // jk no menu actually
+
+/**
+ * ends it all
+ * 
+ */
+const endMenu = () => // jk no menu actually, wrap it up
 {
-    // render the employees data
+    // render the employees data to html
     var data = render(employees);
 
     // make directory if doesn't exist
     fs.mkdir(OUTPUT_DIR, {recursive: true}, (err) => { if (err) throw err; });
 
-    // write our data
+    // write our data to output location
     fs.writeFile(outputPath, data, 'utf-8', (err) => { if (err) throw err; });
 };
 
