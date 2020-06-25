@@ -34,7 +34,7 @@ const EMP_CONVERT = ["engineer","intern","employee","manager"];
 const isEmail = (string) =>
 {
     var valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(string);
-    if (!valid) console.log(" ...Value must be a valid email");
+    if (!valid) return "Value must be a valid email...";
     return valid;
 };
 
@@ -44,11 +44,7 @@ const isEmail = (string) =>
  */
 const isNotBlank = (string) =>
 {
-    if (!string) 
-    {
-        console.log(" ...Value must not be blank");
-        return false;
-    }
+    if (!string) return "Value must not be blank...";
     return true;
 };
 
@@ -59,11 +55,7 @@ const isNotBlank = (string) =>
 const isNumber = (string) =>
 {
     var res = parseInt(string);
-    if (!string || isNaN(res))
-    {
-        console.log(" ...Value must be a valid number");
-        return false;
-    }
+    if (!string || isNaN(res)) return "Value must be a valid number...";
     return true;
 };
 
